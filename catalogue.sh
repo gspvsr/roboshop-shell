@@ -50,13 +50,13 @@ cd /app &>>$LOGFILE
 VALIDATE $? "moving to into app diectory"
 
 unzip /tmp/catalogue.zip &>>$LOGFILE
-
+VALIDATE $? "moving to into app diectory"
 
 cd /app &>>$LOGFILE
 VALIDATE $? "moving to into app diectory"
 
 npm install &>>$LOGFILE
-
+VALIDATE $? "installing the dependencies"
 
 cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
 VALIDATE $? "copying catalogue.service"
@@ -77,4 +77,4 @@ yum install mongodb-org-shell -y &>>$LOGFILE
 VALIDATE $? "installing mongo client"
 
 mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>>$LOGFILE
-VALIDATE $? "loading the catalouge data into mongodb"
+VALIDATE $? "loading catalogue data into mongodb"
