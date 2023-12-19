@@ -1,11 +1,10 @@
 #!/bin/bash
 
-
-
 R="\e[31m"
-G="\e[32m"]
+G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
 
@@ -23,13 +22,14 @@ VALIDATE(){
 
 USERID=$(id -u)
 
-if [ $USERID -ne 0 ]
-then
-    echo "ERROR :: Please install with Root Access"
-    exit 1 # you can give other than 0
-else
-    echo " you are root user"
-fi # fi means reverse of if, indicating condition end
+    if [ $USERID -ne 0 ]
+    then
+        echo "ERROR :: Please install with Root Access"
+        exit 1 # you can give other than 0
+    else
+        echo "you are root user"
+    fi 
+    
 
 dnf module disable nodejs -y  &>> $LOGFILE
 VALIDATE $? "dIsabling current nodejs"
@@ -82,4 +82,5 @@ dnf install mongodb-org-shell -y &>> $LOGFILE
 VALIDATE $? "Installing MongoDB client"
 
 mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>> $LOGFILE
+
 VALIDATE $? "Loading catalouge data into MongoDB"
