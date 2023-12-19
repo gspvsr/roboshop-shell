@@ -26,7 +26,7 @@ VALIDATE(){
     else
         echo -e "$2 ... $G SUCCESS $N"
     fi
-
+}
 
 yum module disable nodejs -y &>>$LOGFILE
 VALIDATE $? "disabling nodejs"
