@@ -52,6 +52,9 @@ VALIDATE $? "moving to into app diectory"
 unzip /tmp/catalogue.zip &>>$LOGFILE
 VALIDATE $? "uzipping catalouge"
 
+cd /app &>>$LOGFILE
+VALIDATE $? "moving to into app diectory"
+
 npm install &>>$LOGFILE
 VALIDATE $? "installing dependencies"
 
