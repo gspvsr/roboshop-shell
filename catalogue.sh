@@ -74,4 +74,4 @@ yum install mongodb-org-shell -y &>>$LOGFILE
 VALIDATE $? "installing mongo client"
 
 mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>>$LOGFILE
-VALIDATE $? "catalouge data"
+VALIDATE $? "loading the catalouge data into mongodb"
