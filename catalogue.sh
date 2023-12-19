@@ -83,5 +83,4 @@ dnf install mongodb-org-shell -y &>> $LOGFILE
 VALIDATE $? "Installing MongoDB client"
 
 mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>> $LOGFILE
-
 VALIDATE $? "Loading catalouge data into MongoDB"
