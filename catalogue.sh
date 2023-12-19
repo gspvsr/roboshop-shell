@@ -28,20 +28,6 @@ VALIDATE(){
     fi
 }
 
-for i in $@
-do 
-    yum list installed $i &>>$LOGFILE
-    if [ $? -ne 0 ]
-    then
-        echo "$i is not installed, let's install it"
-        yum install $i -y &>>$LOGFILE
-        VALIDATE $? "$i"
-    else
-        echo -e "$Y $i is already installed $N"
-    fi
-done
-
-
 yum module disable nodejs -y &>>$LOGFILE
 VALIDATE $? "disabling nodejs"
 
@@ -54,8 +40,20 @@ VALIDATE $? "enabling nodejs:18"
 
 useradd roboshop &>>$LOGFILE
 
+if [ $? -eq 0 ]; then
+    echo -e "useradd ... $G created $N"
+else
+    echo -e "useradd ... $R NOT created $N"
+fi
+
 # write a condition to check directory already exist or not
 mkdir /app &>>$LOGFILE
+
+if [ $? -eq 0 ]; then
+    echo -e "directory ... $G created $N"
+else
+    echo -e "directory... $R NOT created $N"
+fi
 
 curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
 VALIDATE $? "downloading catalogue artifact"
