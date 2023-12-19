@@ -52,9 +52,6 @@ VALIDATE $? "moving to into app diectory"
 unzip /tmp/catalogue.zip &>>$LOGFILE
 VALIDATE $? "moving to into app diectory"
 
-cd /app &>>$LOGFILE
-VALIDATE $? "moving to into app diectory"
-
 npm install &>>$LOGFILE
 VALIDATE $? "installing the dependencies"
 
