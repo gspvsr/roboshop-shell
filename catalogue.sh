@@ -35,7 +35,7 @@ dnf module disable nodejs -y  &>> $LOGFILE
 VALIDATE $? "dIsabling current nodejs"
 
 dnf module enable nodejs:18 -y  &>> $LOGFILE
-VALIDATE $? "Enabling Nodejs:18""
+VALIDATE $? "Enabling Nodejs:18"
 
 dnf install nodejs -y  &>> $LOGFILE
 VALIDATE $? "Installing the nodeJS:18"
