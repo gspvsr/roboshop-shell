@@ -103,3 +103,5 @@ VALIDATE $? "installing mongo client"
 
 mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>>$LOGFILE
 VALIDATE $? "loading catalogue data into the mongodb"
+
+#some updates by mac
