@@ -11,7 +11,7 @@ LOGFILE="/tmp/$0-$TIMESTAMP.log"
 echo "script started executing at $TIMESTAMP" &>> $LOGFILE
 
 VALIDATE(){
-    if [ $1 -ne 0 ]
+    if [ $1 -ne 0 ];
     then 
         echo -e "$2...$R FAILED $N"
         exit 1
@@ -22,7 +22,7 @@ VALIDATE(){
 
 USERID=$(id -u)
 
-    if [ $USERID -ne 0 ]
+    if [ $USERID -ne 0 ];
     then
         echo "ERROR :: Please install with Root Access"
         exit 1 # you can give other than 0
@@ -41,7 +41,7 @@ dnf install nodejs -y  &>> $LOGFILE
 VALIDATE $? "Installing the nodeJS:18"
 
 id roboshop #if roboshop user does not exist, then it is failure
-    if [ $? -ne 0 ]
+    if [ $? -ne 0 ];
     then
         useradd roboshop
         VALIDATE $? "roboshop user creation"
