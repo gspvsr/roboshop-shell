@@ -70,9 +70,14 @@ fi
 
 unzip /tmp/catalogue.zip &>>$LOGFILE
 
-if [ ! -d "/app/extracted_folder" ]; then
+if [ -e "/app/extracted_indicator_file" ]; then
+    echo -e "/app/extracted_indicator_file ... $G ALREADY EXTRACTED $N"
+else
     unzip /tmp/catalogue.zip -d /app &>>$LOGFILE
     VALIDATE $? "unzipping catalogue.zip"
+    
+    # Create an indicator file or folder to mark the extraction
+    touch /app/extracted_indicator_file
 fi
 
 npm install &>>$LOGFILE
