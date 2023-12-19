@@ -62,7 +62,12 @@ cd /app &>>$LOGFILE
 VALIDATE $? "moving to into app diectory"
 
 unzip /tmp/catalogue.zip &>>$LOGFILE
-VALIDATE $? "moving to into app diectory"
+
+if [ $? -eq 0 ]; then
+    echo -e "catalouge ... $G zipped $N"
+else
+    echo -e "catalouge... $R NOT zipped $N"
+fi
 
 npm install &>>$LOGFILE
 VALIDATE $? "installing the dependencies"
