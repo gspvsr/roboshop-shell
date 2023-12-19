@@ -1,105 +1,83 @@
 #!/bin/bash
 
-DATE=$(date +%F)
-LOGSDIR=/tmp/
-# /home/centos/shellscript-logs/script-name-date.log
-SCRIPT_NAME=$0
-LOGFILE=$LOGSDIR/$0-$DATE.log
-USERID=$(id -u)
+USERID=#(id -u)
+
 R="\e[31m"
-N="\e[0m"
+G="\e[32m"]
 Y="\e[33m"
-G="\e[32m"
+N="\e[0m"
+TIMESTAMP=$(date +%F-%H-%M-%S)
+LOGFILE="/tmp/$0-$TIMESTAMP.log"
 
-
-if [ $USERID -ne 0 ]
-then
-    echo -e "$R ERROR:: Please run script with root access $N"
-    exit 1
-fi
+echo "script started executing at $TIMESTAMP" &>> $LOGFILE
 
 VALIDATE(){
-    if [ $1 -ne 0 ];
-    then    
-        echo -e "$2 ... $R FAILURE $N"
+    if [ $1 -ne 0 ]
+    then 
+        echo -e "$2...$R FAILED $N"
         exit 1
-    else
-        echo -e "$2 ... $G SUCCESS $N"
+    else 
+        echo -e $2....$G SUCCESS $N"
     fi
 }
 
-yum module disable nodejs -y &>>$LOGFILE
-VALIDATE $? "disabling nodejs"
-
-yum module enable nodejs:18 -y &>>$LOGFILE
-VALIDATE $? "enabling nodejs:18"
-
-#once the user is created, if you run this cript 2nd time
-# This command will defnitely fail
-# Improvement : first check the user already exist or not, if not exist then create
-
-useradd roboshop &>>$LOGFILE
-
-if [ $? -eq 0 ]; then
-    echo -e "useradd ... $G created $N"
+if [ $USERID -ne 0 ]
+then
+    echo "ERROR :: Please install with Root Access
+    exit 1 # you can give other than 0
 else
-    echo -e "useradd ... $R NOT created $N"
+    echo " you are root user
+fi # fi means reverse of if, indicating condition end
+
+dnf module disable nodejs -y  &>> $LOGFILE
+VALIDATE $? "dIsabling current nodejs"
+
+dnf module enable nodejs:18 -y  &>> $LOGFILE
+VALIDATE $? "Enabling Nodejs:18""
+
+dnf install nodejs -y  &>> $LOGFILE
+VALIDATE $? "Installing the nodeJS:18"
+
+id roboshop #if roboshop user does not exist, then it is failure
+if [ $? -ne 0 ]
+then
+    useradd roboshop
+    VALIDATE $? "roboshop user creation"
+else
+    echo -e "roboshop user already exist $Y SKIPPING $N"
 fi
 
-# write a condition to check directory already exist or not
-mkdir /app &>>$LOGFILE
+mkdir -p /app
+VALIDATE $? "creating app directory"
 
-if [ $? -eq 0 ]; then
-    echo -e "directory ... $G created $N"
-else
-    echo -e "directory... $R NOT created $N"
-fi
+curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip  &>> $LOGFILE
+VALIDATE $? "Downloading catalogue application"
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
-VALIDATE $? "downloading catalogue artifact"
+cd /app 
 
-cd /app &>>$LOGFILE
-VALIDATE $? "moving to into app diectory"
+unzip -o /tmp/catalogue.zip  &>> $LOGFILE
+VALIDATE $? "unzipping catalogue"
 
-if [ -d "/app" ]; then
-    echo -e "/app ... $G EXISTING $N"
-else
-    mkdir /app &>>$LOGFILE
-    VALIDATE $? "creating /app directory"
-fi
+npm install  &>> $LOGFILE
+VALIDATE $? "Installing dependencies"
 
-unzip /tmp/catalogue.zip &>>$LOGFILE
+cp /home/centos/roboshop-shell/catalouge.service /etc/systemd/system/catalogue.service &>> $LOGFILE
+VALIDATE $? "Copying catalogue service file"
 
-if [ -e "/app/extracted_indicator_file" ]; then
-    echo -e "/app/extracted_indicator_file ... $G ALREADY EXTRACTED $N"
-else
-    unzip /tmp/catalogue.zip -d /app &>>$LOGFILE
-    VALIDATE $? "unzipping catalogue.zip"
-    
-    # Create an indicator file or folder to mark the extraction
-    touch /app/extracted_indicator_file
-fi
+systemctl daemon-reload &>> $LOGFILE
+VALIDATE $? "catalogue daemon reload"
 
-npm install &>>$LOGFILE
-VALIDATE $? "installing the dependencies"
+systemctl enable catalogue &>> $LOGFILE
+VALIDATE $? "Enable catalogue"
 
-cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
-VALIDATE $? "copying catalogue.service"
+systemctl start catalogue &>> $LOGFILE
+VALIDATE $? "Starting catalogue"
 
-systemctl daemon-reload &>>$LOGFILE
-VALIDATE $? "demon-reload"
+cp /home/centos/roboshop/mongo.repo /etc/yum.repos.d/mongo.repo  &>> $LOGFILE
+VALIDATE $? "copying mongodb repo"
 
-systemctl enable catalogue &>>$LOGFILE
-VALIDATE $? "enabling catalogue"
+dnf install mongodb-org-shell -y &>> $LOGFILE
+VALIDATE $? "Installing MongoDB client"
 
-systemctl start catalogue &>>$LOGFILE
-VALIDATE $? "estarting catalogue"
-
-cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
-VALIDATE $? "copying mongo.repo"
-
-yum install mongodb-org-shell -y &>>$LOGFILE
-VALIDATE $? "installing mongo client"
-
-mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>>$LOGFILE
-VALIDATE $? "loading catalogue data into the mongodb"
+mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>> $LOGFILE
+VALIDATE $? "Loading catalouge data into MongoDB"
