@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USERID=$(id -u)
+
 
 R="\e[31m"
 G="\e[32m"]
@@ -21,12 +21,14 @@ VALIDATE(){
     fi
 }
 
+USERID=$(id -u)
+
 if [ $USERID -ne 0 ]
 then
     echo "ERROR :: Please install with Root Access
     exit 1 # you can give other than 0
 else
-    echo " you are root user
+    echo " you are root user"
 fi # fi means reverse of if, indicating condition end
 
 dnf module disable nodejs -y  &>> $LOGFILE
