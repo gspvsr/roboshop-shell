@@ -61,12 +61,18 @@ VALIDATE $? "downloading catalogue artifact"
 cd /app &>>$LOGFILE
 VALIDATE $? "moving to into app diectory"
 
+if [ -d "/app" ]; then
+    echo -e "/app ... $G EXISTING $N"
+else
+    mkdir /app &>>$LOGFILE
+    VALIDATE $? "creating /app directory"
+fi
+
 unzip /tmp/catalogue.zip &>>$LOGFILE
 
-if [ $? -eq 0 ]; then
-    echo -e "catalouge ... $G zipped $N"
-else
-    echo -e "catalouge... $R NOT zipped $N"
+if [ ! -d "/app/extracted_folder" ]; then
+    unzip /tmp/catalogue.zip -d /app &>>$LOGFILE
+    VALIDATE $? "unzipping catalogue.zip"
 fi
 
 npm install &>>$LOGFILE
