@@ -36,6 +36,9 @@ VALIDATE $? "download and installing the redis"
 dnf module enable redis:remi-6.2 -y &>> $LOGFILE
 VALIDATE $? "enabling the redis module 6.2"
 
+dnf install redis -y &>> $LOGFILE
+VALIDATE $? "enabling the redis"
+
 sed -i 's/127.0.0.1/0.0.0.0/g' /etc/redis.conf /etc/redis/redis.conf &>> $LOGFILE
 VALIDATE $? "allowing remote connections to redis"
 
