@@ -30,23 +30,29 @@ USERID=$(id -u)
         echo "you are root user"
     fi 
 
+dnf install nginx -y &>> $LOGFILE
+VALIDATE $? "installing nginx"
 
+systemctl enable nginx &>> $LOGFILE
+VALIDATE $? "enabling nginx"
 
-dnf install nginx -y
+systemctl start nginx &>> $LOGFILE
+VALIDATE $? "starting the nginx"
 
-systemctl enable nginx
+rm -rf /usr/share/nginx/html/* &>> $LOGFILE
+VALIDATE $? "removing the default website"
 
-systemctl start nginx
+curl -o /tmp/web.zip https://roboshop-builds.s3.amazonaws.com/web.zip &>> $LOGFILE
+VALIDATE $? "downloading and add the web artifact"
 
+cd /usr/share/nginx/html &>> $LOGFILE
+VALIDATE $? "configuring the html"
 
-rm -rf /usr/share/nginx/html/*
+unzip /tmp/web.zip &>> $LOGFILE
+VALIDATE $? "unzipping web application"
 
-curl -o /tmp/web.zip https://roboshop-builds.s3.amazonaws.com/web.zip
+cp /home/centos/roboshop-shell/roboshop.conf /etc/nginx/default.d/roboshop.conf &>> $LOGFILE
+VALIDATE $? "copying the roboshop.conf"
 
-cd /usr/share/nginx/html
-
-unzip /tmp/web.zip
-
-cp /home/centos/roboshop-shell/web.service /etc/nginx/default.d/roboshop.conf 
-
-systemctl restart nginx 
+systemctl restart nginx &>> $LOGFILE
+VALIDATE $? "restarting the nginx"
