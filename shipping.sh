@@ -22,61 +22,61 @@ VALIDATE(){
 
 USERID=$(id -u)
 
-    if [ $USERID -ne 0 ]
-    then
-        echo "ERROR :: Please install with Root Access"
-        exit 1 # you can give other than 0
-    else
-        echo "you are root user"
-    fi 
+if [ $USERID -ne 0 ]
+then
+    echo "ERROR :: Please install with Root Access"
+    exit 1 # you can give other than 0
+else
+    echo "you are root user"
+fi 
 
-    yum install maven -y
-    VALIDATE $? "installing the maven"
+yum install maven -y &>>$LOGFILE
+VALIDATE $? "installing the maven"
 
-    id roboshop
-    if[ $? -ne 0 ]
-    then
-        useradd roboshop
-        VALIDATE $? "roboshop user creation"
-    else
-        echo -e "roboshop user already exist $Y SKIPPING $N"
-    fi
+id roboshop #if roboshop user does not exist, then it is failure
+if [ $? -ne 0 ]
+then
+    useradd roboshop
+    VALIDATE $? "roboshop user creation"
+else
+    echo -e "roboshop user already exist $Y SKIPPING $N"
+fi
 
-    mkdir -p /app  &>>$LOGFILE
-    VALIDATE $? "creating directory"
+mkdir -p /app  &>>$LOGFILE
+VALIDATE $? "creating directory"
 
-    curl -L -o /tmp/shipping.zip https://roboshop-builds.s3.amazonaws.com/shipping.zip  &>>$LOGFILE
-    VALIDATE $? "downloading the shipping"
+curl -L -o /tmp/shipping.zip https://roboshop-builds.s3.amazonaws.com/shipping.zip  &>>$LOGFILE
+VALIDATE $? "downloading the shipping"
 
-    cd /app
-    VALIDATE $? "moving to the app directory"  &>>$LOGFILE
+cd /app &>>$LOGFILE
+VALIDATE $? "moving to the app directory"  
 
-    unzip -o /tmp/shipping.zip  &>>$LOGFILE
-    VALIDATE $? "unzipping"
+unzip -o /tmp/shipping.zip  &>>$LOGFILE
+VALIDATE $? "unzipping"
 
-    mvn clean package  &>>$LOGFILE
-    VALIDATE $? "cleaning the moven package"
+mvn clean package  &>>$LOGFILE
+VALIDATE $? "cleaning the moven package"
 
-    mv target/shipping-1.0.jar shipping.jar  &>>$LOGFILE
-    VALIDATE $? "moving the file"
+mv target/shipping-1.0.jar shipping.jar  &>>$LOGFILE
+VALIDATE $? "moving the file"
 
-    cp /home/centos/roboshop-shell-tf/shipping.service /etc/systemd/system/shipping.service &>>$LOGFILE
-    VALIDATE $? "copying shipping service"
+cp /home/centos/roboshop-shell-tf/shipping.service /etc/systemd/system/shipping.service &>>$LOGFILE
+VALIDATE $? "copying shipping service"
 
-    systemctl daemon-reload  &>>$LOGFILE
-    VALIDATE $? "reloading the service"
+systemctl daemon-reload  &>>$LOGFILE
+VALIDATE $? "reloading the service"
 
-    systemctl enable shipping  &>>$LOGFILE
-    VALIDATE $? "enabling the service"
+systemctl enable shipping  &>>$LOGFILE
+VALIDATE $? "enabling the service"
 
-    systemctl start shipping  &>>$LOGFILE
-    VALIDATE $? "starting the shipping service"
+systemctl start shipping  &>>$LOGFILE
+VALIDATE $? "starting the shipping service"
 
-    dnf install mysql -y  &>>$LOGFILE
-    VALIDATE $? "installing the mysql"
+dnf install mysql -y  &>>$LOGFILE
+VALIDATE $? "installing the mysql"
 
-    mysql -h mysql.gspawsl.online -uroot -pRoboShop@1 < /app/schema/shipping.sql  &>>$LOGFILE
-    VALIDATE $? "installing the mysql"
+mysql -h mysql.gspawsl.online -uroot -pRoboShop@1 < /app/schema/shipping.sql  &>>$LOGFILE
+VALIDATE $? "installing the mysql"
 
-    systemctl restart shipping  &>>$LOGFILE
-    VALIDATE $? "re-starting the mysql"
+systemctl restart shipping  &>>$LOGFILE
+VALIDATE $? "re-starting the mysql"
