@@ -44,7 +44,6 @@ else
     echo -e "roboshop user already exist $Y SKIPPING $N"
 fi
 
-#write a condition to check directory already exist or not
 mkdir -p /app &>>$LOGFILE
 
 curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
@@ -63,7 +62,6 @@ npm install &>>$LOGFILE
 
 VALIDATE $? "Installing dependencies"
 
-# give full path of catalogue.service because we are inside /app
 cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
 
 VALIDATE $? "copying catalogue.service"
