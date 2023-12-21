@@ -29,13 +29,13 @@ else
     echo "You are root user"
 fi # fi means reverse of if, indicating condition end
 
-dnf module disable nodejs -y &>> $LOGFILE
+curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$LOGFILE
 
-VALIDATE $? "Disabling current NodeJS"
+VALIDATE $? "Setting up NPM Source"
 
-dnf module enable nodejs:18 -y  &>> $LOGFILE
+dnf module enable nodejs -y  &>> $LOGFILE
 
-VALIDATE $? "Enabling NodeJS:18"
+VALIDATE $? "Enabling NodeJS"
 
 dnf install nodejs -y  &>> $LOGFILE
 
