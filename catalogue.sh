@@ -1,45 +1,39 @@
 #!/bin/bash
 
-ID=$(id -u)
+DATE=$(date +%F)
+LOGSDIR=/tmp
+# /home/centos/shellscript-logs/script-name-date.log
+SCRIPT_NAME=$0
+LOGFILE=$LOGSDIR/$0-$DATE.log
+USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
-Y="\e[33m"
 N="\e[0m"
+Y="\e[33m"
 
-TIMESTAMP=$(date +%F-%H-%M-%S)
-LOGFILE="/tmp/$0-$TIMESTAMP.log"
-
-echo "script stareted executing at $TIMESTAMP" &>> $LOGFILE
+if [ $USERID -ne 0 ];
+then
+    echo -e "$R ERROR:: Please run this script with root access $N"
+    exit 1
+fi
 
 VALIDATE(){
-    if [ $1 -ne 0 ]
+    if [ $1 -ne 0 ];
     then
-        echo -e "$2 ... $R FAILED $N"
+        echo -e "$2 ... $R FAILURE $N"
         exit 1
     else
         echo -e "$2 ... $G SUCCESS $N"
     fi
 }
 
-if [ $ID -ne 0 ]
-then
-    echo -e "$R ERROR:: Please run this script with root access $N"
-    exit 1 # you can give other than 0
-else
-    echo "You are root user"
-fi # fi means reverse of if, indicating condition end
-
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$LOGFILE
 
 VALIDATE $? "Setting up NPM Source"
 
-dnf module enable nodejs -y  &>> $LOGFILE
+yum install nodejs -y &>>$LOGFILE
 
-VALIDATE $? "Enabling NodeJS"
-
-dnf install nodejs -y  &>> $LOGFILE
-
-VALIDATE $? "Installing NodeJS:18"
+VALIDATE $? "Installing NodeJS"
 
 id roboshop #if roboshop user does not exist, then it is failure
 if [ $? -ne 0 ]
@@ -50,49 +44,50 @@ else
     echo -e "roboshop user already exist $Y SKIPPING $N"
 fi
 
-mkdir -p /app
+#write a condition to check directory already exist or not
+mkdir -p /app &>>$LOGFILE
 
-VALIDATE $? "creating app directory"
+curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip  &>> $LOGFILE
+VALIDATE $? "downloading catalogue artifact"
 
-VALIDATE $? "Downloading catalogue application"
+cd /app &>>$LOGFILE
 
-cd /app 
+VALIDATE $? "Moving into app directory"
 
-unzip -o /tmp/catalogue.zip  &>> $LOGFILE
+unzip /tmp/catalogue.zip &>>$LOGFILE
 
 VALIDATE $? "unzipping catalogue"
 
-npm install  &>> $LOGFILE
+npm install &>>$LOGFILE
 
 VALIDATE $? "Installing dependencies"
 
-# use absolute, because catalogue.service exists there
-cp /home/centos/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
+# give full path of catalogue.service because we are inside /app
+cp /home/centos/roboshop-shell-tf/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
 
-VALIDATE $? "Copying catalogue service file"
+VALIDATE $? "copying catalogue.service"
 
-systemctl daemon-reload &>> $LOGFILE
+systemctl daemon-reload &>>$LOGFILE
 
-VALIDATE $? "catalogue daemon reload"
+VALIDATE $? "daemon reload"
 
-systemctl enable catalogue &>> $LOGFILE
+systemctl enable catalogue &>>$LOGFILE
 
-VALIDATE $? "Enable catalogue"
+VALIDATE $? "Enabling Catalogue"
 
-systemctl start catalogue &>> $LOGFILE
+systemctl start catalogue &>>$LOGFILE
 
-VALIDATE $? "Starting catalogue"
+VALIDATE $? "Starting Catalogue"
 
-cp /home/centos/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
+cp /home/centos/roboshop-shell-tf/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
 
-VALIDATE $? "copying mongodb repo"
+VALIDATE $? "Copying mongo repo"
 
-dnf install mongodb-org-shell -y &>> $LOGFILE
+yum install mongodb-org-shell -y &>>$LOGFILE
 
-VALIDATE $? "Installing MongoDB client"
+VALIDATE $? "Installing mongo client"
 
-mongo --host mongodb.gspaws.online </app/schema/catalogue.js &>> $LOGFILE
+mongo --host mongodb.joindevops.online </app/schema/catalogue.js &>>$LOGFILE
 
-VALIDATE $? "Loading catalouge data into MongoDB"
+VALIDATE $? "loading catalogue data into mongodb"
