@@ -4,5 +4,5 @@ NAMES=["mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping"
 
 for i in "${NAMES[@]}"
 do 
-    echo "NAME : $i"
+    echo "NAME: $i"
 done
