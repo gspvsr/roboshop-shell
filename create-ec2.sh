@@ -3,7 +3,7 @@
 NAMES=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "web")
 INSTANCE_TYPE=""
 IMAGE_ID=ami-03265a0778a880afb
-SECURITY_GROUP_ID=sg-03e270ec6fa525a88
+SECURITY_GROUP_ID=sg-0223fe155b4863c82
 
 # if mysql or mongodb instance_type should be t3.medium, for all others it is t2.micro
 for i in "${NAMES[@]}"
