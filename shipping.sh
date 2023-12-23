@@ -73,9 +73,9 @@ systemctl start shipping  &>>$LOGFILE
 VALIDATE $? "starting the shipping service"
 
 dnf install mysql -y  &>>$LOGFILE
-VALIDATE $? "installing the mysql"
+VALIDATE $? "installing the mysql client"
 
-mysql -h mysql.gspawsl.online -uroot -pRoboShop@1 < /app/schema/shipping.sql  &>>$LOGFILE
+mysql -h mysql.gspaws.online -uroot -pRoboShop@1 < /app/schema/shipping.sql  &>>$LOGFILE
 VALIDATE $? "installing the mysql"
 
 systemctl restart shipping  &>>$LOGFILE
