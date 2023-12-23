@@ -4,7 +4,7 @@ NAMES=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping"
 INSTANCE_TYPE=""
 IMAGE_ID=ami-03265a0778a880afb
 SECURITY_GROUP_ID=sg-03e270ec6fa525a88
-HOSTED_ZONE-ID=Z092016537ZNYMFFACO0H
+HOSTED_ZONE_ID=Z092016537ZNYMFFACO0H  # Corrected variable name
 DOMAIN_NAME=gspaws.online
 
 # if mysql or mongodb instance_type should be t3.medium, for all others it is t2.micro
@@ -29,7 +29,7 @@ do
                 "ResourceRecordSet": {
                     "Name": "'"$i.$DOMAIN_NAME"'",
                     "Type": "A",
-                    "TTL": 1,
+                    "TTL": 300,
                     "ResourceRecords": [{ "Value": "'"$IP_ADDRESS"'" }]
                 }
             }
@@ -37,4 +37,3 @@ do
     }'
 
 done
-
